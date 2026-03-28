@@ -8,6 +8,7 @@ class SafeZone(BaseModel):
     lat: float
     lng: float
     radius_meters: float
+    label: str = ""
 
 class GeoLock(BaseModel):
     enabled: bool = False
@@ -22,6 +23,17 @@ class UserCreate(BaseModel):
     name: str
     email: EmailStr
     password: str
+    device_id: str
+
+class BiometricLogin(BaseModel):
+    device_id: str
+    biometric_hash: str
+
+class TransactionCreate(BaseModel):
+    receiver_wallet: str
+    amount: float
+    biometric_used: str   # "face_id" or "fingerprint"
+    geo_verified: bool
 
 class UserInDB(BaseModel):
     id: UUID = Field(default_factory=uuid4, alias="_id")
