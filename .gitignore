@@ -1,0 +1,52 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments
+.env
+.venv
+venv/
+ENV/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Flutter / Dart
+/.dart_tool/
+/.flutter-plugins
+/.flutter-plugins-dependencies
+/.packages
+/.pub-cache/
+/.pub/
+/build/
+/biovault_mobile/build/
+/biovault_mobile/.dart_tool/
+/biovault_mobile/.flutter-plugins
+/biovault_mobile/.flutter-plugins-dependencies
+/biovault_mobile/.packages
+/biovault_mobile/.pub-cache/
+/biovault_mobile/.pub/
+
+# Database / Logs
+*.log
+*.sqlite
+*.db
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Android
+*.keystore
+*.jks
+biovault_mobile/android/*.jks
+biovault_mobile/android/*.keystore
+
+# iOS
+biovault_mobile/ios/Flutter/Generated.xcconfig
+biovault_mobile/ios/Flutter/flutter_export_environment.sh
