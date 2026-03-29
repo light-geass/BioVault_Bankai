@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'providers/auth_provider.dart';
 import 'providers/wallet_provider.dart';
-
+import 'screens/onboard_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
@@ -39,41 +39,9 @@ class BioVaultApp extends StatelessWidget {
           if (auth.isLoggedIn) {
             return const DashboardScreen();
           } else {
-            return const LoginScreen();
+            return const OnboardScreen();
           }
         },
-      ),
-    );
-  }
-}
-
-// TODO: Move these screen stubs to separate files in lib/screens/
-class LoginScreen extends StatelessWidget {
-  const LoginScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.lock_person, size: 80, color: Colors.blueAccent),
-            const SizedBox(height: 20),
-            const Text(
-              'BIOVAULT',
-              style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, letterSpacing: 2),
-            ),
-            const SizedBox(height: 40),
-            ElevatedButton(
-              onPressed: () {
-                // For now, testing logic
-                context.read<AuthProvider>().login('user_123', '0x123...456', 'mock_jwt_token');
-              },
-              child: const Text('Login (Mock)'),
-            ),
-          ],
-        ),
       ),
     );
   }
@@ -91,7 +59,14 @@ class DashboardScreen extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
-            onPressed: () => auth.logout(),
+            onPressed: () {
+              auth.logout();
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (_) => const OnboardScreen()),
+                (route) => false,
+              );
+            },
           ),
         ],
       ),
