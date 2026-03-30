@@ -100,6 +100,8 @@ async def register(user: UserCreate, db=Depends(get_db)):
 
     return {
         "user_id": user_id,
+        "name": user.name,
+        "email": user.email,
         "wallet_address": wallet_address,
         "biometric_hash": biometric_hash,
     }

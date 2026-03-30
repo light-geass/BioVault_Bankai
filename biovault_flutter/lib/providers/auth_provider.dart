@@ -7,19 +7,48 @@ class AuthProvider with ChangeNotifier {
   String? userId;
   String? walletAddress;
   String? jwtToken;
+  String? biometricHash;
   bool isLoggedIn = false;
 
-  Future<void> login(String id, String wallet, String token) async {
-    userId = id;
-    walletAddress = wallet;
-    jwtToken = token;
-    isLoggedIn = true;
+  Future<void> register(String name, String email, String password, String deviceId, ApiService apiService) async {
+    try {
+      final res = await apiService.register(name, email, password, deviceId);
+      userId = res['user_id'];
+      walletAddress = res['wallet_address'];
+      biometricHash = res['biometric_hash'];
 
-    await _storage.write(key: 'jwt_token', value: token);
-    await _storage.write(key: 'user_id', value: id);
-    await _storage.write(key: 'wallet_address', value: wallet);
+      // Store biometric hash for future logins
+      await _storage.write(key: 'user_id', value: userId);
+      await _storage.write(key: 'wallet_address', value: walletAddress);
+      await _storage.write(key: 'biometric_hash', value: biometricHash);
+      await _storage.write(key: 'device_id', value: deviceId);
 
-    notifyListeners();
+      // After registration, we still need to login to get a JWT
+      await biometricLogin(deviceId, apiService);
+    } catch (e) {
+      debugPrint('Registration error: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> biometricLogin(String deviceId, ApiService apiService) async {
+    try {
+      final storedHash = await _storage.read(key: 'biometric_hash');
+      if (storedHash == null) throw Exception("No biometric data found. Please register.");
+
+      final res = await apiService.biometricLogin(deviceId, storedHash);
+      
+      jwtToken = res['access_token'];
+      userId = res['user_id'];
+      walletAddress = res['wallet_address'];
+      isLoggedIn = true;
+
+      await _storage.write(key: 'jwt_token', value: jwtToken);
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Login error: $e');
+      rethrow;
+    }
   }
 
   Future<void> logout() async {
@@ -29,9 +58,7 @@ class AuthProvider with ChangeNotifier {
     isLoggedIn = false;
 
     await _storage.delete(key: 'jwt_token');
-    await _storage.delete(key: 'user_id');
-    await _storage.delete(key: 'wallet_address');
-
+    // We keep biometric_hash and user_id for future easy logins
     notifyListeners();
   }
 
@@ -42,6 +69,7 @@ class AuthProvider with ChangeNotifier {
     jwtToken = token;
     userId = await _storage.read(key: 'user_id');
     walletAddress = await _storage.read(key: 'wallet_address');
+    biometricHash = await _storage.read(key: 'biometric_hash');
     isLoggedIn = true;
     
     notifyListeners();

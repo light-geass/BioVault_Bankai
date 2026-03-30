@@ -6,6 +6,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
+from fastapi.middleware.cors import CORSMiddleware
 from routes import auth, wallet, geolock, timelock, recovery
 from db.database import get_db
 
@@ -54,6 +55,14 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="BioVault API", lifespan=lifespan)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Mount routers
 app.include_router(auth.router, prefix="/auth", tags=["auth"])

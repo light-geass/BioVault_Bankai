@@ -69,32 +69,54 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   }
 
   Widget _buildContent() {
+    switch (_currentIndex) {
+      case 0:
+        return _buildHomeView();
+      case 1:
+        return const SendScreen();
+      case 2:
+        return const ReceiveScreen();
+      case 3:
+        return const HistoryScreen();
+      case 4:
+        return const SettingsScreen();
+      default:
+        return _buildHomeView();
+    }
+  }
+
+  Widget _buildHomeView() {
     return Consumer2<AuthProvider, WalletProvider>(
       builder: (context, auth, wallet, child) {
-        return SingleChildScrollView(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildHeader(auth),
-              const SizedBox(height: 24),
-              _buildBalanceCard(wallet),
-              const SizedBox(height: 24),
-              _buildChart(),
-              const SizedBox(height: 24),
-              _buildQuickActions(),
-              const SizedBox(height: 24),
-              Text(
-                'Recent Transactions',
-                style: GoogleFonts.syne(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xFF0F172A),
+        return RefreshIndicator(
+          onRefresh: _fetchData,
+          color: const Color(0xFF3B82F6),
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildHeader(auth),
+                const SizedBox(height: 24),
+                _buildBalanceCard(wallet),
+                const SizedBox(height: 24),
+                _buildChart(),
+                const SizedBox(height: 24),
+                _buildQuickActions(),
+                const SizedBox(height: 24),
+                Text(
+                  'Recent Transactions',
+                  style: GoogleFonts.syne(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: const Color(0xFF0F172A),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              _buildTransactionsList(wallet),
-            ],
+                const SizedBox(height: 16),
+                _buildTransactionsList(wallet),
+              ],
+            ),
           ),
         );
       },
@@ -102,7 +124,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   }
 
   Widget _buildHeader(AuthProvider auth) {
-    final initials = auth.userId != null ? 'User'.substring(0, 1).toUpperCase() : 'U';
+    final initials = auth.userId != null ? 'U' : 'U'; // Could use auth.name if available
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -308,10 +330,12 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        _buildActionCard(Icons.arrow_upward, 'Send', () {}),
-        _buildActionCard(Icons.qr_code, 'Receive', () {}),
-        _buildActionCard(Icons.history, 'History', () {}),
-        _buildActionCard(Icons.timer, 'Time-lock', () {}),
+        _buildActionCard(Icons.arrow_upward, 'Send', () => setState(() => _currentIndex = 1)),
+        _buildActionCard(Icons.qr_code, 'Receive', () => setState(() => _currentIndex = 2)),
+        _buildActionCard(Icons.history, 'History', () => setState(() => _currentIndex = 3)),
+        _buildActionCard(Icons.timer, 'Time-lock', () {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => const TimelockScreen()));
+        }),
       ],
     );
   }

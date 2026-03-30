@@ -7,6 +7,8 @@ import 'providers/auth_provider.dart';
 import 'providers/wallet_provider.dart';
 import 'services/api_service.dart';
 import 'screens/home_screen.dart';
+import 'screens/login_screen.dart';
+import 'screens/register_screen.dart';
 
 @pragma('vm:entry-point')
 void callbackDispatcher() {
@@ -68,8 +70,7 @@ class BioVaultApp extends StatelessWidget {
           if (auth.isLoggedIn) {
             return const HomeScreen(); // Or a custom Wrapper that holds the BottomNav
           } else {
-            // Placeholder for login/onboarding screen
-            return const Scaffold(body: Center(child: Text("Login Screen Placeholder")));
+            return const LoginScreen();
           }
         },
       ),
